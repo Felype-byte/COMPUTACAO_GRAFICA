@@ -58,6 +58,24 @@ const earth = new THREE.Mesh(geometry, material);
 
 scene.add(earth);
 
+// Lua
+const moonGeometry = new THREE.SphereGeometry(0.2, 64, 64);
+const moonMaterial = new THREE.MeshStandardMaterial({
+  color: 0xccccdd,
+  roughness: 0.8,
+  metalness: 0.05
+});
+
+const moonTexture = textureLoader.load('https://threejs.org/examples/textures/planets/moon_1024.jpg');
+moonMaterial.map = moonTexture;
+
+const moon = new THREE.Mesh(moonGeometry, moonMaterial);
+scene.add(moon);
+
+let moonAngle = 0;
+const orbitRadius = 2.8;
+const moonSpeed = 0.01;
+
 // Resize
 window.addEventListener('resize', () => {
 
@@ -79,6 +97,14 @@ function animate() {
   controls.update();
 
   renderer.render(scene, camera);
+  
+  //Fazendo a lua girar
+  moonAngle += moonSpeed;
+
+  if (moonAngle > Math.PI * 2) moonAngle -= Math.PI * 2;
+  moon.position.x = Math.cos(moonAngle) * orbitRadius;
+  moon.position.z = Math.sin(moonAngle) * orbitRadius;
+  moon.rotation.y += 0.005;
 
 }
 
