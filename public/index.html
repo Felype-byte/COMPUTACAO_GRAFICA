@@ -2,17 +2,65 @@
 <html lang="pt-BR">
 
 <head>
-  <meta charset="utf-8">
-  <title>Globo Terrestre 3D</title>
+  <meta charset="utf-8" />
+  <title>Simulador das Fases da Lua</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
-    body {
+    :root {
+      --hud-bg: rgba(0, 0, 0, 0.35);
+      --hud-color: #ffffff;
+      --hud-radius: 6px;
+      --hud-padding: 6px 10px;
+      --font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    html, body {
+      height: 100%;
       margin: 0;
+      background: #000; /* fundo escuro para destacar o espaço */
+      font-family: var(--font-family);
       overflow: hidden;
     }
 
     canvas {
       display: block;
+    }
+
+    /* HUD da fase lunar */
+    #fase {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      color: var(--hud-color);
+      background: var(--hud-bg);
+      padding: var(--hud-padding);
+      border-radius: var(--hud-radius);
+      z-index: 20;
+      font-size: 14px;
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* Container para informações adicionais (opcional) */
+    #info {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      color: var(--hud-color);
+      background: var(--hud-bg);
+      padding: 8px 12px;
+      border-radius: var(--hud-radius);
+      z-index: 20;
+      font-size: 13px;
+      max-width: 320px;
+    }
+
+    /* Ajuste para o painel do lil-gui (ele cria seu próprio elemento) */
+    .lil-gui {
+      z-index: 30 !important;
     }
   </style>
 
@@ -24,14 +72,18 @@
     }
   }
   </script>
-
 </head>
 
 <body>
+  <!-- HUD: fase atual da Lua -->
+  <div id="fase">Fase atual: —</div>
+
+  <!-- Informações rápidas (opcional) -->
+  <div id="info">
+    Use o mouse para orbitar e o painel de controle para ajustar a simulação.
+  </div>
 
   <script type="module" src="./src/main.js"></script>
-
 </body>
 
 </html>
-

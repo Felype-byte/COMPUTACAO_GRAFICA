@@ -1,0 +1,85 @@
+// src/astronomy/coordinates.js
+
+import * as THREE from 'three';
+
+// =====================================================
+// Latitude/Longitude -> Vetor 3D
+// =====================================================
+
+export function latLonToVector3(
+  lat,
+  lon,
+  radius
+) {
+
+  const phi =
+    (90 - lat) *
+    (Math.PI / 180);
+
+  const theta =
+    (lon + 180) *
+    (Math.PI / 180);
+
+  const x =
+    -(
+      radius *
+      Math.sin(phi) *
+      Math.cos(theta)
+    );
+
+  const z =
+    (
+      radius *
+      Math.sin(phi) *
+      Math.sin(theta)
+    );
+
+  const y =
+    (
+      radius *
+      Math.cos(phi)
+    );
+
+  return new THREE.Vector3(
+    x,
+    y,
+    z
+  );
+}
+
+// =====================================================
+// Vetor 3D -> Latitude/Longitude
+// =====================================================
+
+export function vector3ToLatLon(
+  vector
+) {
+
+  const radius =
+    vector.length();
+
+  const lat =
+    90 -
+    (
+      Math.acos(
+        vector.y / radius
+      ) *
+      180 / Math.PI
+    );
+
+  const lon =
+    (
+      Math.atan2(
+        vector.z,
+        -vector.x
+      ) *
+      180 / Math.PI
+    ) - 180;
+
+  return {
+
+    latitude: lat,
+
+    longitude: lon
+  };
+}
