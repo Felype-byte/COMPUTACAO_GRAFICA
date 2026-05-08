@@ -32,11 +32,9 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 
 // Luz
-const light = new THREE.DirectionalLight(0xffffff, 2);
-
-light.position.set(5, 5, 5);
-
-scene.add(light);
+// const light = new THREE.DirectionalLight(0xffffff, 2);
+// light.position.set(5, 5, 5);
+// scene.add(light);
 
 scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
@@ -57,6 +55,22 @@ const material = new THREE.MeshStandardMaterial({
 const earth = new THREE.Mesh(geometry, material);
 
 scene.add(earth);
+
+// Sol
+const sunGeometry = new THREE.SphereGeometry(2.0, 32, 32);
+const sunMaterial = new THREE.MeshBasicMaterial({
+  color: 0xffff00,
+  emissive: 0xffff00,
+  emissiveIntensity: 1.0
+});
+const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+sun.position.set(120, 0, 0); // Posiciona o sol mais distante no fundo
+scene.add(sun);
+
+// Luz direcional do sol
+const sunLight = new THREE.DirectionalLight(0xffffff, 2);
+sunLight.position.copy(sun.position).normalize(); // Direção da luz vindo do sol
+scene.add(sunLight);
 
 // Lua
 const moonGeometry = new THREE.SphereGeometry(0.2, 64, 64);
@@ -97,7 +111,7 @@ function animate() {
   controls.update();
 
   renderer.render(scene, camera);
-  
+
   //Fazendo a lua girar
   moonAngle += moonSpeed;
 
