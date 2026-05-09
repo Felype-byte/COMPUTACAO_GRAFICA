@@ -24,7 +24,7 @@ const renderer = new THREE.WebGLRenderer({
 
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFShadowShadowMap;
+renderer.shadowMap.type = THREE.PCFShadowMap;
 
 document.body.appendChild(renderer.domElement);
 
@@ -59,6 +59,64 @@ earth.castShadow = true;
 earth.receiveShadow = true;
 
 scene.add(earth);
+
+// Marcadores de continente
+const continentMarkers = [];
+const continentDefinitions = [
+  { name: 'América do Norte', lat: 40, lon: -100 },
+  { name: 'América do Sul', lat: -15, lon: -60 },
+  { name: 'Europa', lat: 50, lon: 10 },
+  { name: 'África', lat: 0, lon: 20 },
+  { name: 'Ásia', lat: 40, lon: 100 },
+  { name: 'Oceania', lat: -25, lon: 140 },
+  { name: 'Antártica', lat: -75, lon: 0 }
+];
+
+function latLonToVector3(lat, lon, radius) {
+  const phi = (90 - lat) * (Math.PI / 180);
+  const theta = (lon + 180) * (Math.PI / 180);
+  const x = -radius * Math.sin(phi) * Math.cos(theta);
+  const z = radius * Math.sin(phi) * Math.sin(theta);
+  const y = radius * Math.cos(phi);
+  return new THREE.Vector3(x, y, z);
+}
+
+function createMarker(color) {
+  const material = new THREE.MeshStandardMaterial({
+    color,
+    emissive: color,
+    emissiveIntensity: 0.8,
+    roughness: 0.3,
+    metalness: 0.2
+  });
+
+  const pinGroup = new THREE.Group();
+
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.06, 14, 14), material);
+  head.position.y = 0.16;
+  pinGroup.add(head);
+
+  const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.25, 12), material);
+  stem.position.y = 0.02;
+  pinGroup.add(stem);
+
+  const tip = new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.08, 12), material);
+  tip.position.y = -0.11;
+  tip.rotation.x = Math.PI;
+  pinGroup.add(tip);
+
+  return pinGroup;
+}
+
+for (const continent of continentDefinitions) {
+  const position = latLonToVector3(continent.lat, continent.lon, 1.55);
+  const marker = createMarker(0x00ffcc);
+  marker.position.copy(position);
+  marker.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), position.clone().normalize());
+  marker.userData = { continent: continent.name };
+  earth.add(marker);
+  continentMarkers.push(marker);
+}
 
 // Sol
 const sunGeometry = new THREE.SphereGeometry(2.0, 32, 32);
@@ -103,6 +161,9 @@ scene.add(moon);
 let moonAngle = 0;
 const orbitRadius = 2.8;
 const moonSpeed = 0.01;
+const earthRotationSpeed = 0.002;
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
 
 // Resize
 window.addEventListener('resize', () => {
@@ -141,6 +202,36 @@ animate();
 // Controles do usuário
 const checkIluminacao = document.getElementById('checkIluminacao');
 const checkSombra = document.getElementById('checkSombra');
+const statusContinent = document.getElementById('statusContinent');
+const statusCondition = document.getElementById('statusCondition');
+
+function updateStatus(continent, condition) {
+  statusContinent.textContent = continent;
+  statusCondition.textContent = condition;
+}
+
+function getIlluminationCondition(point) {
+  if (!sunLight.visible) {
+    return 'Não tem iluminação';
+  }
+
+  const normal = point.clone().normalize();
+  const sunDirection = sunLight.position.clone().normalize().negate();
+  const dot = normal.dot(sunDirection);
+  const dayThreshold = Math.cos(70 * Math.PI / 180);
+  const nightThreshold = Math.cos(110 * Math.PI / 180);
+
+  if (dot >= dayThreshold) {
+    return 'Noite';
+  }
+
+  if (dot <= nightThreshold) {
+    return 'Dia';
+  }
+
+  const derivative = sunDirection.dot(new THREE.Vector3(normal.z, 0, -normal.x).multiplyScalar(earthRotationSpeed));
+  return derivative >= 0 ? 'Anoitecendo' : 'Amanhecendo';
+}
 
 // Controlar iluminação do sol
 checkIluminacao.addEventListener('change', (e) => {
@@ -155,4 +246,24 @@ checkSombra.addEventListener('change', (e) => {
   moon.castShadow = e.target.checked;
   moon.receiveShadow = e.target.checked;
   console.log('Sombra:', e.target.checked ? 'ativada' : 'desativada');
+});
+
+renderer.domElement.addEventListener('pointerdown', (event) => {
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(continentMarkers, true);
+
+  if (intersects.length > 0) {
+    let marker = intersects[0].object;
+    while (marker && !marker.userData.continent) {
+      marker = marker.parent;
+    }
+
+    const continent = marker?.userData?.continent || 'Desconhecido';
+    const condition = getIlluminationCondition(intersects[0].point);
+    updateStatus(continent, condition);
+  }
 });

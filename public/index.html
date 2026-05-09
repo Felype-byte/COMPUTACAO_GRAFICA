@@ -51,6 +51,24 @@
       font-size: 14px;
       user-select: none;
     }
+
+    #status {
+      margin-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      padding-top: 12px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .status-row {
+      margin-bottom: 8px;
+    }
+
+    .status-label {
+      font-weight: 600;
+      display: inline-block;
+      width: 90px;
+    }
   </style>
 
   <!-- Import map -->
@@ -74,6 +92,12 @@
     <div class="control-item">
       <input type="checkbox" id="checkSombra" checked>
       <label for="checkSombra">Sombra</label>
+    </div>
+
+    <div id="status">
+      <div class="status-row"><span class="status-label">Continente:</span> <span id="statusContinent">Clique em um
+          marcador</span></div>
+      <div class="status-row"><span class="status-label">Condição:</span> <span id="statusCondition">—</span></div>
     </div>
   </div>
 
