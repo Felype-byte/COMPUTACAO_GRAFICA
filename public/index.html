@@ -9,10 +9,47 @@
     body {
       margin: 0;
       overflow: hidden;
+      font-family: Arial, sans-serif;
     }
 
     canvas {
       display: block;
+    }
+
+    #controls {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 15px;
+      border-radius: 8px;
+      z-index: 100;
+      color: white;
+      min-width: 200px;
+    }
+
+    .control-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+      cursor: pointer;
+    }
+
+    .control-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .control-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+
+    .control-item label {
+      cursor: pointer;
+      font-size: 14px;
+      user-select: none;
     }
   </style>
 
@@ -29,9 +66,19 @@
 
 <body>
 
+  <div id="controls">
+    <div class="control-item">
+      <input type="checkbox" id="checkIluminacao" checked>
+      <label for="checkIluminacao">Iluminação do Sol</label>
+    </div>
+    <div class="control-item">
+      <input type="checkbox" id="checkSombra" checked>
+      <label for="checkSombra">Sombra</label>
+    </div>
+  </div>
+
   <script type="module" src="./src/main.js"></script>
 
 </body>
 
 </html>
-

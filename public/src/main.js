@@ -23,6 +23,8 @@ const renderer = new THREE.WebGLRenderer({
 });
 
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFShadowShadowMap;
 
 document.body.appendChild(renderer.domElement);
 
@@ -53,6 +55,8 @@ const material = new THREE.MeshStandardMaterial({
 });
 
 const earth = new THREE.Mesh(geometry, material);
+earth.castShadow = true;
+earth.receiveShadow = true;
 
 scene.add(earth);
 
@@ -70,6 +74,14 @@ scene.add(sun);
 // Luz direcional do sol
 const sunLight = new THREE.DirectionalLight(0xffffff, 2);
 sunLight.position.copy(sun.position).normalize(); // Direção da luz vindo do sol
+sunLight.castShadow = true;
+sunLight.shadow.mapSize.width = 1024;
+sunLight.shadow.mapSize.height = 1024;
+sunLight.shadow.camera.far = 200;
+sunLight.shadow.camera.left = -50;
+sunLight.shadow.camera.right = 50;
+sunLight.shadow.camera.top = 50;
+sunLight.shadow.camera.bottom = -50;
 scene.add(sunLight);
 
 // Lua
@@ -84,6 +96,8 @@ const moonTexture = textureLoader.load('https://threejs.org/examples/textures/pl
 moonMaterial.map = moonTexture;
 
 const moon = new THREE.Mesh(moonGeometry, moonMaterial);
+moon.castShadow = true;
+moon.receiveShadow = true;
 scene.add(moon);
 
 let moonAngle = 0;
@@ -123,3 +137,22 @@ function animate() {
 }
 
 animate();
+
+// Controles do usuário
+const checkIluminacao = document.getElementById('checkIluminacao');
+const checkSombra = document.getElementById('checkSombra');
+
+// Controlar iluminação do sol
+checkIluminacao.addEventListener('change', (e) => {
+  sunLight.visible = e.target.checked;
+  console.log('Iluminação do sol:', e.target.checked ? 'ativada' : 'desativada');
+});
+
+// Controlar sombra
+checkSombra.addEventListener('change', (e) => {
+  sunLight.castShadow = e.target.checked;
+  earth.receiveShadow = e.target.checked;
+  moon.castShadow = e.target.checked;
+  moon.receiveShadow = e.target.checked;
+  console.log('Sombra:', e.target.checked ? 'ativada' : 'desativada');
+});
