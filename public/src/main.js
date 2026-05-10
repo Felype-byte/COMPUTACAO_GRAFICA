@@ -250,7 +250,7 @@ const simulation = {
   moonSpeed: 0.00017,
   paused: false,
   orbitRadius: 6.0,
-  earthRotationSpeed: 0.005
+  earthRotationSpeed: 0.005,
 
   // Para desligar o sol e as sombras
   sunEnabled: true,
