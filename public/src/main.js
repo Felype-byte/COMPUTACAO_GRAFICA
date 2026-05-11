@@ -5,6 +5,10 @@ import * as THREE from 'three';
 import { OrbitControls }
 from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
 
+//Adicionar modelo .glb
+import { GLTFLoader }
+from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js';
+
 import { createUI }
 from './ui/controls.js';
 
@@ -114,6 +118,9 @@ scene.add(hemi);
 
 const textureLoader = new THREE.TextureLoader();
 
+//referente ao .glb
+const gltfLoader = new GLTFLoader();
+
 const earthTexture = textureLoader.load('./assets/textures/earth_daymap.jpg');
 const moonTexture = textureLoader.load('./assets/textures/moon_map.jpg');
 
@@ -168,6 +175,40 @@ moon.receiveShadow = true;
 scene.add(moon);
 
 // =====================================================
+// Satelite no modelo (.glb)
+// =====================================================
+
+gltfLoader.load(
+
+  './assets/models/satelite.glb',
+
+  (gltf) => {
+
+    const satelite = gltf.scene;
+
+    // Escala 
+    satelite.scale.set(0.009, 0.009, 0.009);
+
+    // Posição 
+    satelite.position.set(0.5, 0.5, 2);
+
+    // Sombras
+    satelite.traverse((child) => {
+
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+
+    });
+    // Satelite gira junto com a Terra
+    earth.add(satelite);
+
+  },
+
+)
+
+// =====================================================
 // Sol aponta para Terra
 // =====================================================
 
@@ -209,14 +250,18 @@ const simulation = {
   moonSpeed: 0.00017,
   paused: false,
   orbitRadius: 6.0,
-  earthRotationSpeed: 0.005
+  earthRotationSpeed: 0.005,
+
+  // Para desligar o sol e as sombras
+  sunEnabled: true,
+  shadowsEnabled: true
 };
 
 // =====================================================
 // UI
 // =====================================================
 
-createUI(simulation);
+createUI(simulation, sunLight, renderer, earth, moon);
 
 // =====================================================
 // Resize
