@@ -4,7 +4,7 @@
 
 O Simulador das Fases da Lua é uma aplicação web interativa desenvolvida com JavaScript e Three.js que representa o sistema Terra–Lua–Sol em um ambiente tridimensional. O projeto permite visualizar de forma dinâmica as fases da Lua, iluminação lunar, rotação da Terra e visibilidade da Lua a partir de um observador terrestre.
 
-A aplicação executa diretamente no navegador utilizando renderização 3D.
+A aplicação executa diretamente no navegador utilizando renderização WebGL em tempo real.
 
 ---
 
@@ -15,13 +15,18 @@ A aplicação executa diretamente no navegador utilizando renderização 3D.
 * Cálculo das fases da Lua
 * Exibição da porcentagem de iluminação lunar
 * Verificação da visibilidade da Lua
-* Simulação de período astronômico
 * Controle livre de câmera
-* Sistema de iluminação dinâmica
 * Sombras em tempo real
 * Interface gráfica de controle
 * HUD com informações astronômicas
-* Importação de modelo 3D externo `.glb`
+* Controle de tempo astronômico
+* Sistema de observador terrestre
+* Controle livre de câmera
+* Câmera do ponto de vista do observador
+* Sistema de atmosfera terrestre
+* Céu estrelado dinâmico
+* Satélites orbitando a Terra
+* Importação de modelos 3D externos `.glb`
 
 ---
 
@@ -33,7 +38,11 @@ A aplicação executa diretamente no navegador utilizando renderização 3D.
 * Three.js
 * OrbitControls
 * GLTFLoader
+* UnrealBloomPass
+* EffectComposer
+* RenderPass
 * lil-gui
+* WebGL
 
 ---
 
@@ -46,7 +55,8 @@ O projeto utiliza múltiplas fontes de luz para aumentar o realismo visual:
 * `DirectionalLight` representando o Sol
 * `AmbientLight`
 * `HemisphereLight`
-* sombras dinâmicas
+* Sombras dinâmicas
+* Correção de cores (`SRGBColorSpace`).
 
 ---
 
@@ -58,6 +68,27 @@ Foram utilizados materiais PBR (`MeshStandardMaterial`) com texturas aplicadas s
 * Lua
 
 Isso proporciona melhor resposta à iluminação da cena.
+
+# Atmosfera Terrestre:
+
+Foi implementado um sistema de atmosfera utilizando o módulo `atmosphere.js`:
+
+Esse sistema adiciona:
+
+* Brilho atmosférico;
+* Camada visual externa;
+* Movimentação de nuvens.
+
+# Céu Estrelado:
+
+O projeto implementa um sistema de estrelas através de `stars.js`:
+
+O céu estrelado possui:
+
+* Animação;
+* Cintilação;
+* Movimentação espacial;
+* Sensação de profundidade.
 
 ---
 
@@ -77,7 +108,7 @@ O usuário pode:
 
 O projeto utiliza importação de modelos `.glb` através de `GLTFLoader`.
 
-Foi adicionado um satélite espacial (`satellite.glb`) integrado à cena tridimensional.
+Foi adicionados dois satélites espaciais (`satellite.glb`) integrados à cena tridimensional.
 
 Estrutura:
 
@@ -129,13 +160,14 @@ http://localhost:5500
 
 # Controles:
 
-| Controle       | Função                        |
-| -------------- | ----------------------------- |
-| Mouse          | Rotacionar câmera             |
-| Scroll         | Zoom                          |
-| Painel lateral | Ajustar parâmetros            |
-| Botão do Sol     | Liga/desliga iluminação solar |
-| Botão da Sombra | Ativa/desativa sombras        |
+| Controle       | Função                            |
+| -------------- | --------------------------------- |
+| Mouse          | Rotacionar câmera                 |
+| Scroll         | Zoom                              |
+| Painel lateral | Ajustar parâmetros                |
+| Luz do Sol     | Liga/desliga iluminação solar     |
+| Modo 3D Base   | Ativa/desativa a escuridão        |
+| Saltar fases   | Posiciona as devidas fases da lua |
 
 ---
 
