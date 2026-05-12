@@ -26,6 +26,9 @@ from './atmosphere.js';
 import { createSun }
 from './sun.js';
 
+import { createStarField } 
+from './stars.js'; 
+
 import {
   updateEarthRotation,
   getObserverTime
@@ -58,81 +61,11 @@ scene.background =
 new THREE.Color(0x000000);
 
 // =====================================================
-// Céu estrelado
+// Céu estrelado (Agora importado do stars.js)
 // =====================================================
 
-function createStarField() {
-
-  const starGeometry =
-  new THREE.BufferGeometry();
-
-  const starCount = 12000;
-
-  const positions = [];
-
-  for (let i = 0; i < starCount; i++) {
-
-    const radius = 400;
-
-    const theta =
-    Math.random() * Math.PI * 2;
-
-    const phi =
-    Math.acos(
-      (Math.random() * 2) - 1
-    );
-
-    const x =
-      radius *
-      Math.sin(phi) *
-      Math.cos(theta);
-
-    const y =
-      radius *
-      Math.sin(phi) *
-      Math.sin(theta);
-
-    const z =
-      radius *
-      Math.cos(phi);
-
-    positions.push(x, y, z);
-
-  }
-
-  starGeometry.setAttribute(
-
-    'position',
-
-    new THREE.Float32BufferAttribute(
-      positions,
-      3
-    )
-
-  );
-
-  const starMaterial =
-  new THREE.PointsMaterial({
-
-    color: 0xffffff,
-
-    size: 0.7,
-
-    sizeAttenuation: true
-
-  });
-
-  const stars =
-  new THREE.Points(
-    starGeometry,
-    starMaterial
-  );
-
-  scene.add(stars);
-
-}
-
-createStarField();
+const stars = createStarField();
+scene.add(stars);
 
 // =====================================================
 // Cameras
@@ -606,7 +539,6 @@ const simulation = {
 // UI
 // =====================================================
 
-// Passando 'ambient' como solicitado para o modo Base 3D funcionar
 createUI(
   simulation,
   sunLight,
@@ -651,6 +583,8 @@ function animate() {
 
   requestAnimationFrame(animate);
 
+  const time = Date.now();
+
   // APLICAÇÃO DA PAUSA UNIVERSAL
   if (!simulation.paused) {
 
@@ -685,12 +619,15 @@ function animate() {
         atmosphere.updateClouds();
     }
 
+    // 5. Cintilação e rotação do Espaço (Novo do stars.js)
+    if (stars && stars.updateStars) {
+        stars.updateStars(time);
+    }
+
   } // Fim do bloco Pausável
 
   // ===================================================
   // PONTO DE VISTA REAL (POV) DO OBSERVADOR
-  // Isso roda fora da pausa para que a câmera responda instantaneamente se 
-  // o usuário clicar em um novo ponto do globo enquanto pausado.
   // ===================================================
   
   if (observer && observer.isObject3D) {
@@ -705,7 +642,7 @@ function animate() {
   }
 
   // ===================================================
-  // Dados lunares (Atualiza sempre, mesmo pausado, para saltos temporais funcionarem)
+  // Dados lunares (Atualiza sempre, mesmo pausado)
   // ===================================================
 
   const moonData = getObserverMoonPhase(observer, moon, sunLight);
@@ -743,14 +680,11 @@ ${(moonData.illumination * 100).toFixed(1)}%
   // Renderização Pipeline (Principal + POV)
   // ===================================================
 
-  // 1. Renderiza a tela cheia principal com Bloom
   composer.render();
 
-  // 2. Renderiza o Quadro POV protegido pela moldura CSS
   renderer.clearDepth(); 
   renderer.setScissorTest(true);
 
-  // Estas medidas acompanham exatamente o tamanho e posição da Moldura CSS
   const pipSize = 250;
   const paddingX = window.innerWidth - pipSize - 20; 
   const paddingY = 20;
@@ -758,13 +692,11 @@ ${(moonData.illumination * 100).toFixed(1)}%
   renderer.setScissor(paddingX, paddingY, pipSize, pipSize);
   renderer.setViewport(paddingX, paddingY, pipSize, pipSize);
 
-  renderer.setClearColor(0x020205); // Céu noturno no POV
+  renderer.setClearColor(0x020205); 
   renderer.clear(true, true, true); 
 
-  // Desenha a cena pelo Ponto de Vista do observador local
   renderer.render(scene, observerCamera);
 
-  // 3. Reseta para o próximo frame
   renderer.setScissorTest(false);
   renderer.setClearColor(0x000000); 
   renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
@@ -772,10 +704,6 @@ ${(moonData.illumination * 100).toFixed(1)}%
 }
 
 animate();
-
-// =====================================================
-// Export
-// =====================================================
 
 export {
   simulation,
