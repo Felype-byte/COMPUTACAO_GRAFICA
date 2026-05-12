@@ -42,17 +42,26 @@ export function getObserverMoonPhase(
   // =====================================================
 
   const phaseAngle = moonToSun.angleTo(moonToObserver);
-
   const illumination = (1 + Math.cos(phaseAngle)) / 2;
 
   // =====================================================
-  // Crescente ou Minguante?
-  // Baseado no plano orbital (XZ) onde o Sol está em +X.
-  // Se Z > 0, está indo da Lua Nova para Cheia (Crescente).
-  // Se Z < 0, está indo da Lua Cheia para Nova (Minguante).
+  // Crescente ou Minguante? (Sincronizado com controls.js)
   // =====================================================
+  // Compara a posição angular da Lua em relação à posição do Sol no plano XZ.
+  
+  const sunAngle = Math.atan2(sunLight.position.z, sunLight.position.x);
+  const moonAngle = Math.atan2(moon.position.z, moon.position.x);
 
-  const isWaning = moon.position.z < 0;
+  // Calcula a diferença de ângulo e normaliza para o intervalo entre 0 e 2π (360º)
+  let angleDiff = moonAngle - sunAngle;
+  while (angleDiff < 0) {
+      angleDiff += Math.PI * 2;
+  }
+  angleDiff = angleDiff % (Math.PI * 2);
+
+  // Se a diferença for maior que π (180º), a Lua já cruzou a metade da órbita
+  // ou seja, já passou da Lua Cheia e está caminhando de volta para a Lua Nova.
+  const isWaning = angleDiff > Math.PI;
 
   // =====================================================
   // Nome da fase
