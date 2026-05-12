@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import { OrbitControls }
 from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
 
-//Adicionar modelo .glb
+// Adicionar modelo .glb
 import { GLTFLoader }
 from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js';
 
@@ -39,17 +39,94 @@ from './astronomy/observer.js';
 // =====================================================
 
 const scene = new THREE.Scene();
+
 scene.background = new THREE.Color(0x000000);
+
+// =====================================================
+// Céu estrelado
+// =====================================================
+
+function createStarField() {
+
+  const starGeometry = new THREE.BufferGeometry();
+
+  const starCount = 12000;
+
+  const positions = [];
+
+  for (let i = 0; i < starCount; i++) {
+
+    const radius = 400;
+
+    const theta = Math.random() * Math.PI * 2;
+
+    const phi = Math.acos((Math.random() * 2) - 1);
+
+    const x =
+      radius *
+      Math.sin(phi) *
+      Math.cos(theta);
+
+    const y =
+      radius *
+      Math.sin(phi) *
+      Math.sin(theta);
+
+    const z =
+      radius *
+      Math.cos(phi);
+
+    positions.push(x, y, z);
+
+  }
+
+  starGeometry.setAttribute(
+    'position',
+    new THREE.Float32BufferAttribute(
+      positions,
+      3
+    )
+  );
+
+  const starMaterial =
+  new THREE.PointsMaterial({
+
+    color: 0xffffff,
+
+    size: 0.7,
+
+    sizeAttenuation: true
+
+  });
+
+  const stars =
+  new THREE.Points(
+    starGeometry,
+    starMaterial
+  );
+
+  scene.add(stars);
+
+}
+
+createStarField();
 
 // =====================================================
 // Camera
 // =====================================================
 
-const camera = new THREE.PerspectiveCamera(
+const camera =
+new THREE.PerspectiveCamera(
+
   75,
-  window.innerWidth / window.innerHeight,
+
+  window.innerWidth /
+  window.innerHeight,
+
   0.1,
+
   1000
+
 );
 
 camera.position.set(0, 3, 6);
@@ -58,89 +135,160 @@ camera.position.set(0, 3, 6);
 // Renderer
 // =====================================================
 
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+const renderer =
+new THREE.WebGLRenderer({
 
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(window.devicePixelRatio || 1);
-renderer.outputEncoding = THREE.sRGBEncoding;
+  antialias: true
+
+});
+
+renderer.setSize(
+  window.innerWidth,
+  window.innerHeight
+);
+
+renderer.setPixelRatio(
+  window.devicePixelRatio || 1
+);
+
+renderer.outputEncoding =
+THREE.sRGBEncoding;
+
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-document.body.appendChild(renderer.domElement);
+renderer.shadowMap.type =
+THREE.PCFSoftShadowMap;
+
+document.body.appendChild(
+  renderer.domElement
+);
 
 // =====================================================
 // Controles
 // =====================================================
 
-const controls = new OrbitControls(camera, renderer.domElement);
+const controls =
+new OrbitControls(
+  camera,
+  renderer.domElement
+);
+
 controls.enableDamping = true;
 
 // =====================================================
 // Sol
 // =====================================================
 
-const sunLight = new THREE.DirectionalLight(0xffffff, 1.6);
+const sunLight =
+new THREE.DirectionalLight(
+  0xffffff,
+  1.6
+);
+
 sunLight.position.set(10, 0, 0);
+
 sunLight.castShadow = true;
 
 const d = 6.5;
+
 sunLight.shadow.camera.left = -d;
 sunLight.shadow.camera.right = d;
 sunLight.shadow.camera.top = d;
 sunLight.shadow.camera.bottom = -d;
+
 sunLight.shadow.camera.near = 0.5;
 sunLight.shadow.camera.far = 50;
+
 sunLight.shadow.mapSize.width = 2048;
 sunLight.shadow.mapSize.height = 2048;
+
 sunLight.shadow.radius = 2;
+
 sunLight.shadow.bias = -0.0005;
 
 scene.add(sunLight);
+
 scene.add(sunLight.target);
 
 // =====================================================
 // Luz ambiente
 // =====================================================
 
-const ambient = new THREE.AmbientLight(0xffffff, 0.03);
+const ambient =
+new THREE.AmbientLight(
+  0xffffff,
+  0.03
+);
+
 scene.add(ambient);
 
 // =====================================================
 // Luz hemisférica
 // =====================================================
 
-const hemi = new THREE.HemisphereLight(0x8899ff, 0x222222, 0.04);
+const hemi =
+new THREE.HemisphereLight(
+  0x8899ff,
+  0x222222,
+  0.04
+);
+
 scene.add(hemi);
 
 // =====================================================
 // Texturas
 // =====================================================
 
-const textureLoader = new THREE.TextureLoader();
+const textureLoader =
+new THREE.TextureLoader();
 
-//referente ao .glb
-const gltfLoader = new GLTFLoader();
+// Referente ao .glb
+const gltfLoader =
+new GLTFLoader();
 
-const earthTexture = textureLoader.load('./assets/textures/earth_daymap.jpg');
-const moonTexture = textureLoader.load('./assets/textures/moon_map.jpg');
+const earthTexture =
+textureLoader.load(
+  './assets/textures/earth_daymap.jpg'
+);
+
+const moonTexture =
+textureLoader.load(
+  './assets/textures/moon_map.jpg'
+);
 
 // =====================================================
 // Terra
 // =====================================================
 
-const earthGeo = new THREE.SphereGeometry(1.5, 64, 64);
+const earthGeo =
+new THREE.SphereGeometry(
+  1.5,
+  64,
+  64
+);
 
-const earthMat = new THREE.MeshStandardMaterial({
+const earthMat =
+new THREE.MeshStandardMaterial({
+
   map: earthTexture,
+
   roughness: 1.0,
+
   metalness: 0.0
+
 });
 
-const earth = new THREE.Mesh(earthGeo, earthMat);
+const earth =
+new THREE.Mesh(
+  earthGeo,
+  earthMat
+);
+
 earth.receiveShadow = true;
 
 // Inclinação axial
-earth.rotation.z = 23.5 * (Math.PI / 180);
+earth.rotation.z =
+23.5 * (Math.PI / 180);
 
 scene.add(earth);
 
@@ -148,35 +296,84 @@ scene.add(earth);
 // Observador
 // =====================================================
 
-const observer = createObserver(earth);
+const observer =
+createObserver(earth);
 
 // =====================================================
 // Controle do observador
 // =====================================================
 
-setupObserverControls(observer, earth, camera, renderer);
+setupObserverControls(
+  observer,
+  earth,
+  camera,
+  renderer
+);
 
 // =====================================================
 // Lua
 // =====================================================
 
-const moonGeo = new THREE.SphereGeometry(0.4, 64, 64);
+const moonGeo =
+new THREE.SphereGeometry(
+  0.4,
+  64,
+  64
+);
 
-const moonMat = new THREE.MeshStandardMaterial({
+const moonMat =
+new THREE.MeshStandardMaterial({
+
   map: moonTexture,
+
   roughness: 0.8,
+
   metalness: 0.0
+
 });
 
-const moon = new THREE.Mesh(moonGeo, moonMat);
+const moon =
+new THREE.Mesh(
+  moonGeo,
+  moonMat
+);
+
 moon.castShadow = true;
+
 moon.receiveShadow = true;
 
 scene.add(moon);
 
 // =====================================================
-// Satelite no modelo (.glb)
+// Satélites orbitando a Terra
 // =====================================================
+
+const satellites = [];
+
+function createSatelliteOrbit(
+  satellite,
+  radius,
+  speed,
+  offsetY = 0
+) {
+
+  return {
+
+    mesh: satellite,
+
+    angle:
+    Math.random() *
+    Math.PI * 2,
+
+    radius,
+
+    speed,
+
+    offsetY
+
+  };
+
+}
 
 gltfLoader.load(
 
@@ -184,29 +381,93 @@ gltfLoader.load(
 
   (gltf) => {
 
-    const satelite = gltf.scene;
+    // =============================================
+    // Satélite 1
+    // =============================================
 
-    // Escala 
-    satelite.scale.set(0.009, 0.009, 0.009);
+    const satellite1 =
+    gltf.scene.clone();
 
-    // Posição 
-    satelite.position.set(0.5, 0.5, 2);
+    satellite1.scale.set(
+      0.006,
+      0.006,
+      0.006
+    );
 
-    // Sombras
-    satelite.traverse((child) => {
+    satellite1.traverse((child) => {
 
       if (child.isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
+
+        child.castShadow = false;
+        child.receiveShadow = false;
+
       }
 
     });
-    // Satelite gira junto com a Terra
-    earth.add(satelite);
 
-  },
+    scene.add(satellite1);
 
-)
+    satellites.push(
+
+      createSatelliteOrbit(
+
+        satellite1,
+
+        2.1,
+
+        0.01,
+
+        0.75
+
+      )
+
+    );
+
+    // =============================================
+    // Satélite 2
+    // =============================================
+
+    const satellite2 =
+    gltf.scene.clone();
+
+    satellite2.scale.set(
+      0.005,
+      0.005,
+      0.005
+    );
+
+    satellite2.traverse((child) => {
+
+      if (child.isMesh) {
+
+        child.castShadow = false;
+        child.receiveShadow = false;
+
+      }
+
+    });
+
+    scene.add(satellite2);
+
+    satellites.push(
+
+      createSatelliteOrbit(
+
+        satellite2,
+
+        2.3,
+
+        0.007,
+
+        -0.35
+
+      )
+
+    );
+
+  }
+
+);
 
 // =====================================================
 // Sol aponta para Terra
@@ -218,27 +479,46 @@ sunLight.target = earth;
 // HUD
 // =====================================================
 
-let faseEl = document.getElementById('fase');
+let faseEl =
+document.getElementById('fase');
 
 if (!faseEl) {
-  const el = document.createElement('div');
+
+  const el =
+  document.createElement('div');
+
   el.id = 'fase';
 
   Object.assign(el.style, {
+
     position: 'absolute',
+
     top: '10px',
+
     left: '10px',
+
     color: 'white',
-    fontFamily: 'Arial, sans-serif',
-    background: 'rgba(0,0,0,0.35)',
+
+    fontFamily:
+    'Arial, sans-serif',
+
+    background:
+    'rgba(0,0,0,0.35)',
+
     padding: '8px 12px',
+
     borderRadius: '6px',
+
     zIndex: 10,
+
     whiteSpace: 'pre-line'
+
   });
 
   document.body.appendChild(el);
+
   faseEl = el;
+
 }
 
 // =====================================================
@@ -246,63 +526,151 @@ if (!faseEl) {
 // =====================================================
 
 const simulation = {
+
   moonAngle: 0,
+
   moonSpeed: 0.00017,
+
   paused: false,
+
   orbitRadius: 6.0,
+
   earthRotationSpeed: 0.005,
 
-  // Para desligar o sol e as sombras
+  // Para desligar o sol e sombras
   sunEnabled: true,
+
   shadowsEnabled: true
+
 };
 
 // =====================================================
 // UI
 // =====================================================
 
-createUI(simulation, sunLight, renderer, earth, moon);
+createUI(
+  simulation,
+  sunLight,
+  renderer,
+  earth,
+  moon
+);
 
 // =====================================================
 // Resize
 // =====================================================
 
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
+window.addEventListener(
+  'resize',
+  () => {
+
+    camera.aspect =
+    window.innerWidth /
+    window.innerHeight;
+
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(
+      window.innerWidth,
+      window.innerHeight
+    );
+
+  }
+);
 
 // =====================================================
 // Animate
 // =====================================================
 
 function animate() {
+
   requestAnimationFrame(animate);
 
   if (!simulation.paused) {
-    simulation.moonAngle += simulation.moonSpeed;
-    updateEarthRotation(earth, simulation);
+
+    simulation.moonAngle +=
+    simulation.moonSpeed;
+
+    updateEarthRotation(
+      earth,
+      simulation
+    );
+
   }
 
+  // ===================================================
   // Órbita da Lua
-  moon.position.x = Math.cos(simulation.moonAngle) * simulation.orbitRadius;
-  moon.position.z = Math.sin(simulation.moonAngle) * simulation.orbitRadius;
+  // ===================================================
+
+  moon.position.x =
+    Math.cos(simulation.moonAngle) *
+    simulation.orbitRadius;
+
+  moon.position.z =
+    Math.sin(simulation.moonAngle) *
+    simulation.orbitRadius;
 
   // Travamento de maré
   moon.lookAt(earth.position);
+
   moon.rotateY(Math.PI);
 
+  // ===================================================
+  // Órbita dos satélites
+  // ===================================================
+
+  satellites.forEach((satellite) => {
+
+    satellite.angle +=
+    satellite.speed;
+
+    satellite.mesh.position.x =
+      Math.cos(satellite.angle) *
+      satellite.radius;
+
+    satellite.mesh.position.z =
+      Math.sin(satellite.angle) *
+      satellite.radius;
+
+    satellite.mesh.position.y =
+      satellite.offsetY;
+
+    satellite.mesh.lookAt(
+      earth.position
+    );
+
+  });
+
+  // ===================================================
   // Dados lunares
-  const moonData = getObserverMoonPhase(observer, moon, sunLight);
+  // ===================================================
+
+  const moonData =
+  getObserverMoonPhase(
+    observer,
+    moon,
+    sunLight
+  );
 
   // Lua visível?
-  const moonVisible = isMoonVisible(observer, moon);
+  const moonVisible =
+  isMoonVisible(
+    observer,
+    moon
+  );
 
   // Horário astronômico
-  const observerTime = getObserverTime(observer, earth, sunLight);
+  const observerTime =
+  getObserverTime(
+    observer,
+    earth,
+    sunLight
+  );
 
-  // HUD atualizado (sem horário, latitude e longitude)
+  // ===================================================
+  // HUD atualizado
+  // ===================================================
+
   faseEl.innerText =
 `
 Período:
@@ -313,6 +681,7 @@ ${moonVisible ? 'Visível' : 'Abaixo do horizonte'}
 `;
 
   if (moonVisible) {
+
     faseEl.innerText += `
 
 Fase:
@@ -321,10 +690,16 @@ ${moonData.phaseName}
 Iluminação:
 ${(moonData.illumination * 100).toFixed(1)}%
 `;
+
   }
 
   controls.update();
-  renderer.render(scene, camera);
+
+  renderer.render(
+    scene,
+    camera
+  );
+
 }
 
 animate();
