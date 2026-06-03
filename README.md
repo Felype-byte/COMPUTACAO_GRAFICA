@@ -1,6 +1,6 @@
 # Simulador das Fases da Lua 3D
 
-# Simulador das Fases da Lua 3D
+## Visualização do projeto:
 
 <p align="center">
   <img src="public/visao_geral.png" alt="Visão Geral do Simulador" width="800">
