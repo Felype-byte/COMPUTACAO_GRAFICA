@@ -1,5 +1,11 @@
 # Simulador das Fases da Lua 3D
 
+# Simulador das Fases da Lua 3D
+
+<p align="center">
+  <img src="public/visao_geral.png" alt="Visão Geral do Simulador" width="800">
+</p>
+
 ## Descrição:
 
 O Simulador das Fases da Lua é uma aplicação web interativa desenvolvida com JavaScript e Three.js que representa o sistema Terra–Lua–Sol em um ambiente tridimensional. O projeto permite visualizar de forma dinâmica as fases da Lua, iluminação lunar, rotação da Terra e visibilidade da Lua a partir de um observador terrestre.
